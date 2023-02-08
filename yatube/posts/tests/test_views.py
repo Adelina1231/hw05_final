@@ -178,3 +178,20 @@ class PostPagesTests(TestCase):
             reverse('posts:profile_unfollow',
                     kwargs={'username': self.user_following.username}))
         self.assertEqual(Follow.objects.all().count(), 0)
+
+    def test_follow_auth(self) -> None:
+        self.authorized_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user}))
+        follow = Follow.objects.filter(
+            user=self.user, author=self.user).count()
+        self.assertEqual(follow, 0)
+
+    def test_authorized_can_subscribe_only_once(self) -> None:
+        self.authorized_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user_following.username}))
+        self.authorized_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user_following.username}))
+        self.assertEqual(self.user.follower.count(), 1)
