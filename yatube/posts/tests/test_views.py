@@ -133,12 +133,12 @@ class PostPagesTests(TestCase):
         self.assertIn('form', response.context)
         self.assertIsInstance(response.context['form'], PostForm)
 
-    def test_post_with_group(self):
+    def test_post_with_group(self) -> None:
         """Проверка: пост попадает в нужную группу."""
         self.assertEqual(self.post_2.group.title, 'Тестовая группа 2')
         self.assertEqual(self.post_2.text, 'Тестовый пост 2')
 
-    def test_post_correct_appear(self):
+    def test_post_correct_appear(self) -> None:
         """Проверка: пост появляется на нужной странице."""
         Follow.objects.create(user=self.user, author=self.user_following)
         page_names = {
@@ -168,7 +168,7 @@ class PostPagesTests(TestCase):
         new_posts = response_new.content
         self.assertNotEqual(old_posts, new_posts)
 
-    def test_authorized_can_follow(self):
+    def test_authorized_can_follow(self) -> None:
         """Авторизованный пользователь может подписаться и отписаться."""
         self.authorized_client.get(
             reverse('posts:profile_follow',
@@ -180,6 +180,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(Follow.objects.all().count(), 0)
 
     def test_follow_auth(self) -> None:
+        """Авторизованный пользователь не может подписаться на самого себя."""
         self.authorized_client.get(
             reverse('posts:profile_follow',
                     kwargs={'username': self.user}))
@@ -188,6 +189,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(follow, 0)
 
     def test_authorized_can_subscribe_only_once(self) -> None:
+        """Авторизованный пользователь не может подписаться дважды."""
         self.authorized_client.get(
             reverse('posts:profile_follow',
                     kwargs={'username': self.user_following.username}))
